@@ -1,17 +1,13 @@
+const express = require("express");
 const axios = require("axios");
+const cors = require("cors");
 
-export default async function handler(req, res) {
-    // Configurar CORS para permitir requisições do Dynamics CRM
-    res.setHeader("Access-Control-Allow-Origin", "*"); 
-    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+const app = express();
+const PORT = 3000;
 
-    // Responder rapidamente a requisições OPTIONS (CORS Preflight)
-    if (req.method === "OPTIONS") {
-        return res.status(204).end();
-    }
+app.use(cors());
 
-    // Pegar o CNPJ da query string
+app.get("/api/busca", async (req, res) => {
     const { cnpj } = req.query;
 
     if (!cnpj) {
@@ -24,13 +20,10 @@ export default async function handler(req, res) {
             headers: { "Accept": "application/json" }
         });
 
-        return res.status(200).json(response.data);
+        res.json(response.data);
     } catch (error) {
-        console.error("Erro ao buscar CNPJ:", error.message);
-
-        return res.status(500).json({
-            error: "Erro ao buscar CNPJ",
-            message: error.response?.data || error.message,
-        });
+        res.status(500).json({ error: "Erro ao buscar CNPJ" });
     }
-}
+});
+
+app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));
