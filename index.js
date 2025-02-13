@@ -1,14 +1,17 @@
 const axios = require("axios");
 
 export default async function handler(req, res) {
-    res.setHeader("Access-Control-Allow-Origin", "https://orgfc2c51d8.crm2.dynamics.com");
+    // Configurar CORS para permitir requisições do Dynamics CRM
+    res.setHeader("Access-Control-Allow-Origin", "*"); 
     res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
+    // Responder rapidamente a requisições OPTIONS (CORS Preflight)
     if (req.method === "OPTIONS") {
-        return res.status(200).end(); // Responde ao preflight request do CORS
+        return res.status(204).end();
     }
 
+    // Pegar o CNPJ da query string
     const { cnpj } = req.query;
 
     if (!cnpj) {
@@ -21,8 +24,13 @@ export default async function handler(req, res) {
             headers: { "Accept": "application/json" }
         });
 
-        res.json(response.data);
+        return res.status(200).json(response.data);
     } catch (error) {
-        res.status(500).json({ error: "Erro ao buscar CNPJ" });
+        console.error("Erro ao buscar CNPJ:", error.message);
+
+        return res.status(500).json({
+            error: "Erro ao buscar CNPJ",
+            message: error.response?.data || error.message,
+        });
     }
 }
