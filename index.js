@@ -1,22 +1,28 @@
-export default function handler(req, res) {
-  const { cnpj } = req.query;
+const axios = require("axios");
 
-  if (!cnpj) {
-    return res.status(400).json({ error: 'CNPJ é obrigatório' });
-  }
+export default async function handler(req, res) {
+    res.setHeader("Access-Control-Allow-Origin", "https://orgfc2c51d8.crm2.dynamics.com");
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  const apiUrl = `https://receitaws.com.br/v1/cnpj/${cnpj}`;
+    if (req.method === "OPTIONS") {
+        return res.status(200).end(); // Responde ao preflight request do CORS
+    }
 
-  fetch(apiUrl, {
-    headers: {
-      'Accept': 'application/json',
-    },
-  })
-    .then(response => response.json())
-    .then(data => {
-      return res.status(200).json(data);
-    })
-    .catch(err => {
-      return res.status(500).json({ error: 'Erro ao buscar CNPJ', details: err });
-    });
+    const { cnpj } = req.query;
+
+    if (!cnpj) {
+        return res.status(400).json({ error: "CNPJ é obrigatório" });
+    }
+
+    try {
+        const apiUrl = `https://receitaws.com.br/v1/cnpj/${cnpj}`;
+        const response = await axios.get(apiUrl, {
+            headers: { "Accept": "application/json" }
+        });
+
+        res.json(response.data);
+    } catch (error) {
+        res.status(500).json({ error: "Erro ao buscar CNPJ" });
+    }
 }

@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 export default async function handler(req, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Permite acesso de qualquer origem
+    res.setHeader("Access-Control-Allow-Origin", "https://orgfc2c51d8.crm2.dynamics.com");
     res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
